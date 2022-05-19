@@ -115,11 +115,7 @@ class Cifar10Loader():
             dct[b'data'] -= self.train_mean
 
         if self.zero_center:
-            if self.normalize:
-                dct[b'data'] -= .5
-            else:
-                dct[b'data'] -= 127.5
-
+            dct[b'data'] -= .5 if self.normalize else 127.5
         return dct[b'data'], dct[b'labels']
 
     def load_train_epoch(self, batch_size=50, onehot=True,
@@ -147,11 +143,7 @@ class Cifar10Loader():
                 dct[b'data'] -= self.train_mean
 
             if self.zero_center:
-                if self.normalize:
-                    dct[b'data'] -= .5
-                else:
-                    dct[b'data'] -= 127.5
-
+                dct[b'data'] -= .5 if self.normalize else 127.5
             arrays = [dct[b'data'], dct[b'labels']]
             del dct
             indices = np.arange(arrays[0].shape[0])
@@ -184,7 +176,7 @@ def mnist_export_to_jpg(path='./'):
     cnt = -1
 
     def remove_incomplete_existing(path_prefix, expect_files):
-        dir_path = os.path.join(path, 'mnist_%s' % path_prefix)
+        dir_path = os.path.join(path, f'mnist_{path_prefix}')
 
         is_empty = False
         if not os.path.exists(dir_path):
@@ -194,7 +186,7 @@ def mnist_export_to_jpg(path='./'):
                     os.makedirs(outpath)
             is_empty = True
         else:
-            num_existing_files = len(glob.glob('%s/*/*.jpg' % dir_path))
+            num_existing_files = len(glob.glob(f'{dir_path}/*/*.jpg'))
             if num_existing_files > 0 and num_existing_files < expect_files:
                 shutil.rmtree(dir_path)
                 is_empty = True

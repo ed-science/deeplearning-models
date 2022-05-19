@@ -38,7 +38,7 @@ def quickdraw_npy_to_imagefile(inpath, outpath, filetype='png', subset=None):
         npy_list = [i for i in npy_list if i.split('.npy')[0] in subset]
 
     if not len(npy_list):
-        raise ValueError('No .npy files found in %s' % inpath)
+        raise ValueError(f'No .npy files found in {inpath}')
 
     npy_paths = [os.path.join(inpath, i) for i in npy_list]
 
@@ -50,12 +50,10 @@ def quickdraw_npy_to_imagefile(inpath, outpath, filetype='png', subset=None):
             os.mkdir(folder)
         X = np.load(j)
 
-        cnt = 0
-        for row in X:
+        for cnt, row in enumerate(X):
             img_array = row.reshape(28, 28)
             assert cnt < 1000000
             outfile = os.path.join(folder, '%s_%06d.%s' % (
                 label, cnt, filetype))
             imageio.imwrite(outfile,
                             img_array[:, :])
-            cnt += 1

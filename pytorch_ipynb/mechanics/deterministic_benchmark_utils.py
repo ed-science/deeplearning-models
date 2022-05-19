@@ -68,10 +68,7 @@ class ResNet(nn.Module):
 
     def __init__(self, block, layers, num_classes, grayscale):
         self.inplanes = 64
-        if grayscale:
-            in_dim = 1
-        else:
-            in_dim = 3
+        in_dim = 1 if grayscale else 3
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(in_dim, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
@@ -103,12 +100,9 @@ class ResNet(nn.Module):
                 nn.BatchNorm2d(planes * block.expansion),
             )
 
-        layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample))
+        layers = [block(self.inplanes, planes, stride, downsample)]
         self.inplanes = planes * block.expansion
-        for i in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
-
+        layers.extend(block(self.inplanes, planes) for _ in range(1, blocks))
         return nn.Sequential(*layers)
 
     def forward(self, x):
@@ -132,11 +126,12 @@ class ResNet(nn.Module):
 
 def resnet101(num_classes, grayscale):
     """Constructs a ResNet-101 model."""
-    model = ResNet(block=Bottleneck, 
-                   layers=[3, 4, 23, 3],
-                   num_classes=num_classes,
-                   grayscale=grayscale)
-    return model
+    return ResNet(
+        block=Bottleneck,
+        layers=[3, 4, 23, 3],
+        num_classes=num_classes,
+        grayscale=grayscale,
+    )
 
 
 
