@@ -52,8 +52,7 @@ class PyTorchModel(torch.nn.Module):
         all_layers = []
         for hidden_unit in hidden_units:
             layer = torch.nn.Linear(input_size, hidden_unit, bias=False)
-            all_layers.append(layer)
-            all_layers.append(torch.nn.ReLU())
+            all_layers.extend((layer, torch.nn.ReLU()))
             input_size = hidden_unit
 
         output_layer = torch.nn.Linear(
@@ -142,8 +141,7 @@ class LightningModel(pl.LightningModule):
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        return optimizer
+        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
 
 ##################################################################
@@ -180,34 +178,31 @@ class DataModule(pl.LightningDataModule):
         self.train, self.valid = random_split(train, lengths=[55000, 5000])
 
     def train_dataloader(self):
-        train_loader = DataLoader(
+        return DataLoader(
             dataset=self.train,
             batch_size=BATCH_SIZE,
             drop_last=True,
             shuffle=True,
             num_workers=NUM_WORKERS,
         )
-        return train_loader
 
     def val_dataloader(self):
-        valid_loader = DataLoader(
+        return DataLoader(
             dataset=self.valid,
             batch_size=BATCH_SIZE,
             drop_last=False,
             shuffle=False,
             num_workers=NUM_WORKERS,
         )
-        return valid_loader
 
     def test_dataloader(self):
-        test_loader = DataLoader(
+        return DataLoader(
             dataset=self.test,
             batch_size=BATCH_SIZE,
             drop_last=False,
             shuffle=False,
             num_workers=NUM_WORKERS,
         )
-        return test_loader
 
 
 ##################################################################

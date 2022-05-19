@@ -8,8 +8,7 @@ def compute_accuracy(model, data_loader, device):
     model.eval()
     with torch.no_grad():
         correct_pred, num_examples = 0, 0
-        for i, (features, targets) in enumerate(data_loader):
-
+        for features, targets in data_loader:
             features = features.to(device)
             targets = targets.to(device)
 
@@ -45,8 +44,7 @@ def compute_confusion_matrix(model, data_loader, device):
     all_targets, all_predictions = [], []
     with torch.no_grad():
 
-        for i, (features, targets) in enumerate(data_loader):
-
+        for features, targets in data_loader:
             features = features.to(device)
             targets = targets
             logits = model(features)
@@ -65,9 +63,6 @@ def compute_confusion_matrix(model, data_loader, device):
         else:
             class_labels = np.array([class_labels[0], 1])
     n_labels = class_labels.shape[0]
-    lst = []
     z = list(zip(all_targets, all_predictions))
-    for combi in product(class_labels, repeat=2):
-        lst.append(z.count(combi))
-    mat = np.asarray(lst)[:, None].reshape(n_labels, n_labels)
-    return mat
+    lst = [z.count(combi) for combi in product(class_labels, repeat=2)]
+    return np.asarray(lst)[:, None].reshape(n_labels, n_labels)

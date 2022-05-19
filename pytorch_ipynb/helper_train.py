@@ -122,10 +122,14 @@ def train_classifier_simple_v2(
 
         model.eval()
         with torch.no_grad():  # save memory during inference
-            if not skip_train_acc:
-                train_acc = compute_accuracy(model, train_loader, device=device).item()
-            else:
-                train_acc = float('nan')
+            train_acc = (
+                float('nan')
+                if skip_train_acc
+                else compute_accuracy(
+                    model, train_loader, device=device
+                ).item()
+            )
+
             valid_acc = compute_accuracy(model, valid_loader, device=device).item()
             train_acc_list.append(train_acc)
             valid_acc_list.append(valid_acc)
